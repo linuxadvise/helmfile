@@ -1,0 +1,53 @@
+image:
+  repository: {{ requiredEnv "REPOSITORY_URL" }}
+  tag: {{ requiredEnv "IMAGE_TAG" }}
+
+service:
+  enabled: true
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: {{ requiredEnv "DOMAIN_NAME" }}
+      paths:
+        - /
+  tls:
+  - hosts:
+    - {{ requiredEnv "DOMAIN_NAME" }}
+    secretName: {{ requiredEnv "DOMAIN_NAME" }}-tls-cert
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+ports:
+  - name: http
+    containerPort: 3000
+    protocol: TCP
+
+livenessProbe:
+  initialDelaySeconds: 30
+  tcpSocket:
+    port: 3000
+readinessProbe:
+  initialDelaySeconds: 30
+  tcpSocket:
+    port: 3000
+
+env:
+  - name: REPOSITORY_URL
+    value: {{ env "REPOSITORY_URL" }}
+  - name: IMAGE_TAG
+    value: {{ env "IMAGE_TAG" }}
+  - name: NODE_ENV
+    value: "development"
+  - name: DB
+    value: {{ env "DB" }}

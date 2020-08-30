@@ -1,0 +1,12 @@
+releases:
+  - name: "appname"
+    namespace: {{ env "NAMESPACE" | default "appnamespace" }}
+    labels:
+      chart: "appname"
+      component: "appname"
+      namespace: {{ env "NAMESPACE" | default "appnamespace" }}
+    chart: "../../charts/appname"
+    wait: true
+    installed: {{ env "INSTALLED" | default "true" }}
+    values:
+    - ../values/appname.yaml.gotmpl
